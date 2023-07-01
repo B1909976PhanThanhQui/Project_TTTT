@@ -1,4 +1,7 @@
 import { FcInternal, FcSearch, FcSpeaker } from "react-icons/fc";
+import { FaRegBookmark, FaBookmark } from "react-icons/fa6";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import axios from "axios";
 
@@ -6,6 +9,50 @@ function HomePage() {
   const [keyword, setKeyWord] = useState("");
   const API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en";
   const [word, setWord] = useState("");
+
+  //Notification - WordMark
+  const [wordmark, setWordMark] = useState(true);
+
+  const notify = () => {
+    if (wordmark) {
+      toast.success("Mark Word !", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+
+      let arrayWord = JSON.parse(localStorage.getItem("markword"));
+
+      let objectWord = {
+        name: word,
+        defi: definition1,
+      };
+
+      if (arrayWord) {
+        arrayWord.push(objectWord);
+        localStorage.setItem("markword", JSON.stringify(arrayWord));
+      } else {
+        let array = [];
+        array.push(objectWord);
+        localStorage.setItem("markword", JSON.stringify(array));
+      }
+
+      setWordMark(false);
+    } else {
+      toast.warning("Unmark Word !", {
+        position: toast.POSITION.TOP_CENTER,
+      });
+
+      let arrayWord = JSON.parse(localStorage.getItem("markword"));
+      arrayWord.forEach((item, index) => {
+        if (item.name === word) {
+          arrayWord.splice(item, 1);
+        }
+      });
+
+      localStorage.setItem("markword", JSON.stringify(arrayWord));
+
+      setWordMark(true);
+    }
+  };
 
   const [searchbtn, setSearchBtn] = useState(true);
 
@@ -28,6 +75,7 @@ function HomePage() {
   //Function Find Word
   const handleFindWord = async () => {
     try {
+      setWordMark(true);
       const resultFromAPI = await axios.get(`${API_URL}/${keyword}`);
       if (resultFromAPI.data.length > 1) {
         const result = resultFromAPI.data[0];
@@ -105,15 +153,14 @@ function HomePage() {
         setAudio2("");
         setPhonetics2("");
       }
+        document.querySelector(".resultContent").style.display = "block";
     } catch (err) {
       document.querySelector(".resultContent").style.display =
         "none !important";
-      alert("Your word was not found !");
-   
-      console.log(err);
+      toast.warning("Your word not found !", {
+        position: toast.POSITION.TOP_CENTER,
+      });
     }
-
-    document.querySelector(".resultContent").style.display = "block";
 
     setKeyWord("");
     setSearchBtn(true);
@@ -139,7 +186,7 @@ function HomePage() {
       style={{ display: "flex", justifyContent: "center" }}
     >
       <div className="TopHeading" style={{ width: "500px" }}>
-        <h2>Find The Word</h2>
+        <h2>Enter Your Word</h2>
         <p>
           Please input your english word below &nbsp;
           <FcInternal />
@@ -179,6 +226,7 @@ function HomePage() {
             className="content"
             style={{
               border: "1px solid #ccc",
+              position: "relative",
               backgroundColor: "#ffffff",
               padding: "10px",
               borderRadius: "5px",
@@ -186,7 +234,35 @@ function HomePage() {
               boxShadow: "1px 1px 2px 0.5px grey",
             }}
           >
-            <h6 className="fw-bold">{word}</h6>
+            <h6
+              className="fw-bold"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              {word}
+              {wordmark ? (
+                <FaRegBookmark
+                  style={{
+                    fontSize: "30px",
+                    cursor: "pointer",
+                    position: "absolute",
+                    right: "10",
+                  }}
+                  onClick={notify}
+                />
+              ) : (
+                <FaBookmark
+                  style={{
+                    fontSize: "30px",
+                    cursor: "pointer",
+                    position: "absolute",
+                    right: "10",
+                  }}
+                  onClick={notify}
+                />
+              )}
+
+              <ToastContainer autoClose={1000} />
+            </h6>
             <p style={{ fontSize: "13px", marginTop: "15px" }}>
               {/* Noun */}
               <div className="NounType" style={{ display: "none" }}>
@@ -197,7 +273,7 @@ function HomePage() {
                     onClick={() => {
                       playAudio({ audio1 });
                     }}
-                    style={{ borderRadius: "30px", borderColor: "#4ab89f" }}
+                    style={{ borderRadius: "7px", borderColor: "#4ab89f" }}
                   >
                     <FcSpeaker />
                   </button>
@@ -222,7 +298,7 @@ function HomePage() {
                     onClick={() => {
                       playAudio({ audio2 });
                     }}
-                    style={{ borderRadius: "30px", borderColor: "#4ab89f" }}
+                    style={{ borderRadius: "7px", borderColor: "#4ab89f" }}
                   >
                     <FcSpeaker />
                   </button>
