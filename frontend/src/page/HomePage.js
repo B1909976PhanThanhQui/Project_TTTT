@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import axios from "axios";
+import {baseURL} from "../utils/constant";
 
 function HomePage() {
   const [keyword, setKeyWord] = useState("");
@@ -22,8 +23,8 @@ function HomePage() {
       let arrayWord = JSON.parse(localStorage.getItem("markword"));
 
       let objectWord = {
-        name: word,
-        defi: definition1,
+        cardName: word,
+        definition: definition1,
       };
 
       if (arrayWord) {
@@ -36,6 +37,12 @@ function HomePage() {
       }
 
       setWordMark(false);
+
+      axios.post(`${baseURL}/create`, {card: JSON.stringify(objectWord)}).then((res)=>{
+        console.log(res.data)
+      })
+
+
     } else {
       toast.warning("Unmark Word !", {
         position: toast.POSITION.TOP_CENTER,
@@ -43,7 +50,7 @@ function HomePage() {
 
       let arrayWord = JSON.parse(localStorage.getItem("markword"));
       arrayWord.forEach((item, index) => {
-        if (item.name === word) {
+        if (item.cardName === word) {
           arrayWord.splice(item, 1);
         }
       });

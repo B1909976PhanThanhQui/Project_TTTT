@@ -27,3 +27,14 @@ a{
   outline: none;
   margin-left: 15px;
 }
+
+
+/* FlashCard */
+.editPen{
+  color:black;
+
+}
+
+.deleteTrash{
+  color:red;
+}

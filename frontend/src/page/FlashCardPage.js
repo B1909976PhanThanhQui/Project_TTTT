@@ -1,33 +1,34 @@
 import { useEffect, useState } from "react";
-import { FaTrashCan } from "react-icons/fa6";
+import React from "react";
+import { FaPenToSquare, FaTrash } from "react-icons/fa6";
+import { FcFlowChart } from "react-icons/fc";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
+import { baseURL } from "../utils/constant";
 
 function FlashCardPage() {
-  const [dataMark, setdataMark] = useState([]);
+  const [words, setWords] = useState([]);
+  const [updateUI, setUpdateUI] = useState(false);
 
   useEffect(() => {
-    const dataList = JSON.parse(localStorage.getItem("markword"));
-    setdataMark(dataList);
-  }, []);
-
-  //Delete Word Mark
-  const deleteWordMark = (inputName) => {
-    console.log(inputName)
-    toast.warning("Unmark Word !", {
-      position: toast.POSITION.TOP_CENTER,
+    axios.get(`${baseURL}/get`).then((res) => {
+      console.log(res.data);
+      setWords(res.data);
     });
+  }, [updateUI]);
 
-    let arrayWord = JSON.parse(localStorage.getItem("markword"));
-    for (let i = 0; i < arrayWord.length; i++) {
-      if (arrayWord[i].name === inputName) {
-        arrayWord.splice(i, 1);
-        break;
-      }
-    }
-
-    setdataMark(arrayWord);
-    localStorage.setItem("markword", JSON.stringify(arrayWord));
+  const removeCard = (id) => {
+    axios
+      .delete(`${baseURL}/delete/${id}`)
+      .then((res) => {
+        alert('Delete Success !')
+        console.log(res);
+        setUpdateUI((prevState) => !prevState);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -40,28 +41,47 @@ function FlashCardPage() {
       }}
     >
       {/* List Word Marked */}
-      <div className="ListWord" style={{width:"400px"}}>
-        <h2 style={{ marginBottom: "30px" }}>Word List</h2>
+      <div className="ListWord" style={{ width: "400px" }}>
+        <h2 style={{ marginBottom: "30px" }}>
+          Word List <FcFlowChart />
+        </h2>
         <ol class="list-group list-group-numbered">
-          {dataMark.map((item, index) => (
-            <li
-              class="list-group-item d-flex justify-content-between align-items-start"
-              key={index}
-            >
-              <div class="ms-2 me-auto">
-                <div class="fw-bold">{item.name}</div>
-                {item.defi}
-              </div>
-              <span class="badge bg-primary rounded-pill">
-                <FaTrashCan
-                  onClick={()=>{
-                    deleteWordMark(item.name)}}
-                  style={{ cursor: "pointer" }}
-                />
-                <ToastContainer autoClose={1000} />
-              </span>
-            </li>
-          ))}
+          {words.length != 0 ? (
+            words.map((item, index) => (
+              <li
+                class="list-group-item d-flex justify-content-between align-items-start"
+                key={index}
+              >
+                <div class="ms-2 me-auto">
+                  <div class="fw-bold">{item.cardName}</div>
+                  {item.definition}
+                </div>
+                <span
+                  class="badge rounded-pill"
+                  style={{
+                    fontSize: "15px",
+                    backgroundColor: "white",
+                    border: "2px solid #4ab89f",
+                  }}
+                >
+                  <FaPenToSquare
+                    className="editPen"
+                    style={{ marginRight: "20px", cursor: "pointer" }}
+                  />
+                  <FaTrash
+                    className="deleteTrash"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      removeCard(item._id);
+                    }}
+                  />
+                  <ToastContainer autoClose={3000} />
+                </span>
+              </li>
+            ))
+          ) : (
+            <h6 style={{ color: "#4ab89f",fontStyle:"italic" }}>Empty Word</h6>
+          )}
         </ol>
       </div>
 
