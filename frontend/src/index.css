@@ -38,3 +38,22 @@ a{
 .deleteTrash{
   color:red;
 }
+
+
+/* FlashCard */
+.container_flashCard{
+  width: 500px;
+  margin: 0 auto;
+}
+
+.btn_nav_left, .btn_nav_right{
+  border-radius: 5px;
+  padding:10px;
+  border-color: aliceblue;
+  margin-right: 20px;
+  color: #4ab89f;
+}
+
+.btn_nav_right{
+  color:black;
+}

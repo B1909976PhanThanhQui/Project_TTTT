@@ -38,7 +38,7 @@ function HomePage() {
 
       setWordMark(false);
 
-      axios.post(`${baseURL}/create`, {card: JSON.stringify(objectWord)}).then((res)=>{
+      axios.post(`${baseURL}/create`, {objectWord}).then((res)=>{
         console.log(res.data)
       })
 
@@ -203,6 +203,7 @@ function HomePage() {
           <FcSearch />
           <input
             type="text"
+            placeholder="Text Here..."
             style={{ width: "75%", marginRight: "10px" }}
             value={keyword}
             onChange={(e) => {

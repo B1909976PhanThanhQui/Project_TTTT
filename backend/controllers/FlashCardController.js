@@ -11,7 +11,7 @@ module.exports.createCard = async(req, res) => {
 	//Cú pháp destructuring nên tuẩn thủ viết đúng tên biến. VD : const {cardName, definition} = req.body -> Phải truyền vào 2 biến giống tên như vậy trong {}
     const card = req.body;
 
-    FlashCardModel.create(JSON.parse(card.card))
+    FlashCardModel.create(card.objectWord)
     .then((data) => {
         console.log("Create Success !");
         res.status(200).send(data);
@@ -27,7 +27,7 @@ module.exports.updateCard = async(req, res) => {
     const {id} = req.params;
     const card = req.body;
 
-    FlashCardModel.findByIdAndUpdate(id, card)
+    FlashCardModel.findByIdAndUpdate(id, card.objectWord)
     .then(() => res.send("Updated Successfully"))
     .catch((err) => {
         console.log(err);
